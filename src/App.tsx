@@ -19,7 +19,7 @@ export default function App() {
             <span className="text-2xl sm:text-3xl">🎷</span>
             <div className="min-w-0">
               <h1 className="text-lg sm:text-2xl font-bold truncate">
-                Jazz Fest Planner 2025
+                Jazz Fest Planner 2026
               </h1>
               <p className="text-purple-200 text-xs sm:text-sm hidden sm:block">
                 New Orleans Jazz & Heritage Festival + NOLA Shows
@@ -162,6 +162,17 @@ export default function App() {
                   className="underline"
                 >
                   JazzFestGrids.com
+                </a>
+              </p>
+              <p>
+                Made with ❤️ by{" "}
+                <a
+                  href="https://github.com/jadamita"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="underline"
+                >
+                  Joseph Adamita
                 </a>
               </p>
             </div>
