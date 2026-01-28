@@ -186,17 +186,17 @@ function generateCaptcha(): { question: string; answer: number } {
 }
 
 const DATES = [
-  { value: "2025-04-23", label: "Wed, Apr 23" },
-  { value: "2025-04-24", label: "Thu, Apr 24" },
-  { value: "2025-04-25", label: "Fri, Apr 25" },
-  { value: "2025-04-26", label: "Sat, Apr 26" },
-  { value: "2025-04-27", label: "Sun, Apr 27 (Daze Between)" },
-  { value: "2025-04-28", label: "Mon, Apr 28 (Daze Between)" },
-  { value: "2025-04-29", label: "Tue, Apr 29 (Daze Between)" },
-  { value: "2025-04-30", label: "Wed, Apr 30" },
-  { value: "2025-05-01", label: "Thu, May 1" },
-  { value: "2025-05-02", label: "Fri, May 2" },
-  { value: "2025-05-03", label: "Sat, May 3" },
+  { value: "2026-04-23", label: "Thu, Apr 23" },
+  { value: "2026-04-24", label: "Fri, Apr 24" },
+  { value: "2026-04-25", label: "Sat, Apr 25" },
+  { value: "2026-04-26", label: "Sun, Apr 26 (Daze Between)" },
+  { value: "2026-04-27", label: "Mon, Apr 27 (Daze Between)" },
+  { value: "2026-04-28", label: "Tue, Apr 28 (Daze Between)" },
+  { value: "2026-04-29", label: "Wed, Apr 29" },
+  { value: "2026-04-30", label: "Thu, Apr 30" },
+  { value: "2026-05-01", label: "Fri, May 1" },
+  { value: "2026-05-02", label: "Sat, May 2" },
+  { value: "2026-05-03", label: "Sun, May 3" },
 ];
 
 interface AdminPageProps {
