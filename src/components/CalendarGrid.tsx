@@ -101,6 +101,35 @@ function isJazzFestDate(dateStr: string): boolean {
   return JAZZ_FEST_DATES.includes(dateStr);
 }
 
+// Check if a venue has any events matching the search query
+function venueHasMatchingEvents(
+  venue: Doc<"venues">,
+  events: Record<string, EventData[]>,
+  searchQuery: string,
+  fuzzySearch: boolean,
+  showAllJazzFest: boolean
+): boolean {
+  if (!searchQuery.trim()) return true;
+
+  for (const date of DATES) {
+    const dayEvents = events[date] || [];
+
+    // Apply same filtering logic as VenueRow
+    const searchFiltered = dayEvents.filter((e) =>
+      eventMatchesSearch(e, searchQuery, fuzzySearch)
+    );
+
+    const filteredEvents =
+      venue.isJazzFest && !showAllJazzFest
+        ? searchFiltered.filter((e) => e.isHeadliner)
+        : searchFiltered;
+
+    if (filteredEvents.length > 0) return true;
+  }
+
+  return false;
+}
+
 export default function CalendarGrid({
   venues,
   eventMap,
@@ -108,6 +137,17 @@ export default function CalendarGrid({
   searchQuery,
   fuzzySearch,
 }: CalendarGridProps) {
+  // Filter venues to only show those with matching events
+  const filteredVenues = venues.filter((venue) =>
+    venueHasMatchingEvents(
+      venue,
+      eventMap[venue._id] || {},
+      searchQuery,
+      fuzzySearch,
+      showAllJazzFest
+    )
+  );
+
   return (
     <div className="overflow-x-auto pb-4 -mx-4 px-4 sm:mx-0 sm:px-0">
       <div
@@ -144,7 +184,7 @@ export default function CalendarGrid({
         })}
 
         {/* Venue rows */}
-        {venues.map((venue) => (
+        {filteredVenues.map((venue) => (
           <VenueRow
             key={venue._id}
             venue={venue}

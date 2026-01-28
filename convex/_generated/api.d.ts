@@ -8,7 +8,9 @@
  * @module
  */
 
+import type * as crons from "../crons.js";
 import type * as events from "../events.js";
+import type * as scraper from "../scraper.js";
 
 import type {
   ApiFromModules,
@@ -17,7 +19,9 @@ import type {
 } from "convex/server";
 
 declare const fullApi: ApiFromModules<{
+  crons: typeof crons;
   events: typeof events;
+  scraper: typeof scraper;
 }>;
 
 /**

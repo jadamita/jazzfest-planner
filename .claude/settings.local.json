@@ -6,7 +6,8 @@
       "Bash(npm install:*)",
       "Bash(npm run scrape:*)",
       "Bash(npm run seed-headliners:*)",
-      "Bash(npx convex dev:*)"
+      "Bash(npx convex dev:*)",
+      "Bash(npx tsc:*)"
     ]
   }
 }
