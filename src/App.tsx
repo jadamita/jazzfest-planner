@@ -146,7 +146,7 @@ export default function App() {
 
             <div className="mt-8 text-sm text-slate-500 dark:text-slate-400">
               <p>
-                <strong>Jazz Fest 2025:</strong> Week 1: Apr 23-26 | Week 2: Apr
+                <strong>Jazz Fest 2026:</strong> Week 1: Apr 23-26 | Week 2: Apr
                 30 - May 3
               </p>
               <p className="mt-1">
