@@ -2,14 +2,20 @@ import { useState } from "react";
 import { useQuery } from "convex/react";
 import { api } from "../convex/_generated/api";
 import CalendarGrid from "./components/CalendarGrid";
+import AdminPage from "./components/AdminPage";
 
 export default function App() {
   const calendarData = useQuery(api.events.getCalendarData);
   const [showAllJazzFest, setShowAllJazzFest] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [fuzzySearch, setFuzzySearch] = useState(true);
+  const [showAdmin, setShowAdmin] = useState(false);
 
   const hasData = calendarData?.venues && calendarData.venues.length > 0;
+
+  if (showAdmin) {
+    return <AdminPage onBack={() => setShowAdmin(false)} />;
+  }
 
   return (
     <div className="min-h-screen">
@@ -79,6 +85,15 @@ export default function App() {
               />
               <span className="hidden sm:inline">Fuzzy Search</span>
             </label>
+            <button
+              onClick={() => setShowAdmin(true)}
+              className="p-2 hover:bg-white/20 rounded-lg transition-colors"
+              title="Add Event"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+              </svg>
+            </button>
           </div>
         </div>
       </header>

@@ -25,6 +25,8 @@ export default defineSchema({
     price: v.optional(v.string()),
     // Is this a headliner? (for Jazz Fest filtering)
     isHeadliner: v.optional(v.boolean()),
+    // Has this event been approved? (false for user submissions until reviewed)
+    approved: v.optional(v.boolean()),
   })
     .index("by_venue", ["venueId"])
     .index("by_date", ["date"])

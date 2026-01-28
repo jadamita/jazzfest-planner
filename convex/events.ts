@@ -29,7 +29,11 @@ export const getCalendarData = query({
   args: {},
   handler: async (ctx) => {
     const venues = await ctx.db.query("venues").withIndex("by_order").collect();
-    const events = await ctx.db.query("events").collect();
+    const allEvents = await ctx.db.query("events").collect();
+
+    // Filter out unapproved events (approved === false)
+    // Events with approved: true or approved: undefined (legacy) are shown
+    const events = allEvents.filter((e) => e.approved !== false);
 
     // Group events by venue and date
     const eventMap: Record<string, Record<string, EventData[]>> = {};
@@ -67,6 +71,22 @@ export const addVenue = mutation({
   },
 });
 
+// Create a new venue with auto-generated order
+export const createVenue = mutation({
+  args: {
+    name: v.string(),
+    isJazzFest: v.boolean(),
+  },
+  handler: async (ctx, args) => {
+    const venues = await ctx.db.query("venues").collect();
+    const maxOrder = venues.reduce((max, v) => Math.max(max, v.order), -1);
+    return await ctx.db.insert("venues", {
+      ...args,
+      order: maxOrder + 1,
+    });
+  },
+});
+
 export const addEvent = mutation({
   args: {
     venueId: v.id("venues"),
@@ -80,7 +100,11 @@ export const addEvent = mutation({
     isHeadliner: v.optional(v.boolean()),
   },
   handler: async (ctx, args) => {
-    return await ctx.db.insert("events", args);
+    // User-submitted events require approval before being shown publicly
+    return await ctx.db.insert("events", {
+      ...args,
+      approved: false,
+    });
   },
 });
 
@@ -174,6 +198,7 @@ export const importScrapedData = internalMutation({
         time: show.time,
         doors: show.doors,
         price: show.price,
+        approved: true, // Scraped events are auto-approved
       });
     }
 
