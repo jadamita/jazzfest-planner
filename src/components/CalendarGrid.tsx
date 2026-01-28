@@ -42,7 +42,11 @@ function strictMatch(query: string, target: string): boolean {
 }
 
 // Check if an event matches the search query
-function eventMatchesSearch(event: EventData, query: string, useFuzzy: boolean): boolean {
+function eventMatchesSearch(
+  event: EventData,
+  query: string,
+  useFuzzy: boolean,
+): boolean {
   if (!query.trim()) return true;
 
   const matchFn = useFuzzy ? fuzzyMatch : strictMatch;
@@ -62,29 +66,29 @@ function eventMatchesSearch(event: EventData, query: string, useFuzzy: boolean):
 // Jazz Fest dates: April 23-26 (Week 1) and April 30 - May 3 (Week 2)
 // April 27-29 are the "Daze Between" - no Jazz Fest but plenty of night shows
 const DATES = [
-  "2025-04-23",
-  "2025-04-24",
-  "2025-04-25",
-  "2025-04-26",
-  "2025-04-27",
-  "2025-04-28",
-  "2025-04-29",
-  "2025-04-30",
-  "2025-05-01",
-  "2025-05-02",
-  "2025-05-03",
+  "2026-04-23",
+  "2026-04-24",
+  "2026-04-25",
+  "2026-04-26",
+  "2026-04-27",
+  "2026-04-28",
+  "2026-04-29",
+  "2026-04-30",
+  "2026-05-01",
+  "2026-05-02",
+  "2026-05-03",
 ];
 
 // Actual Jazz Fest dates (Fair Grounds open)
 const JAZZ_FEST_DATES = [
-  "2025-04-23",
-  "2025-04-24",
-  "2025-04-25",
-  "2025-04-26",
-  "2025-04-30",
-  "2025-05-01",
-  "2025-05-02",
-  "2025-05-03",
+  "2026-04-23",
+  "2026-04-24",
+  "2026-04-25",
+  "2026-04-26",
+  "2026-04-30",
+  "2026-05-01",
+  "2026-05-02",
+  "2026-05-03",
 ];
 
 function formatDate(dateStr: string): { day: string; weekday: string } {
@@ -107,7 +111,7 @@ function venueHasMatchingEvents(
   events: Record<string, EventData[]>,
   searchQuery: string,
   fuzzySearch: boolean,
-  showAllJazzFest: boolean
+  showAllJazzFest: boolean,
 ): boolean {
   if (!searchQuery.trim()) return true;
 
@@ -116,7 +120,7 @@ function venueHasMatchingEvents(
 
     // Apply same filtering logic as VenueRow
     const searchFiltered = dayEvents.filter((e) =>
-      eventMatchesSearch(e, searchQuery, fuzzySearch)
+      eventMatchesSearch(e, searchQuery, fuzzySearch),
     );
 
     const filteredEvents =
@@ -144,8 +148,8 @@ export default function CalendarGrid({
       eventMap[venue._id] || {},
       searchQuery,
       fuzzySearch,
-      showAllJazzFest
-    )
+      showAllJazzFest,
+    ),
   );
 
   return (
@@ -207,7 +211,13 @@ interface VenueRowProps {
   fuzzySearch: boolean;
 }
 
-function VenueRow({ venue, events, showAllJazzFest, searchQuery, fuzzySearch }: VenueRowProps) {
+function VenueRow({
+  venue,
+  events,
+  showAllJazzFest,
+  searchQuery,
+  fuzzySearch,
+}: VenueRowProps) {
   const isJazzFestVenue = venue.isJazzFest;
 
   return (
@@ -237,7 +247,9 @@ function VenueRow({ venue, events, showAllJazzFest, searchQuery, fuzzySearch }: 
 
         // Filter by search query first
         const searchFiltered = searchQuery.trim()
-          ? dayEvents.filter((e) => eventMatchesSearch(e, searchQuery, fuzzySearch))
+          ? dayEvents.filter((e) =>
+              eventMatchesSearch(e, searchQuery, fuzzySearch),
+            )
           : dayEvents;
 
         // Then filter Jazz Fest events based on showAllJazzFest toggle
