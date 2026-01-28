@@ -2,12 +2,34 @@ import { useState, useCallback } from "react";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { Id } from "../../convex/_generated/dataModel";
+import { usePostHog } from "posthog-js/react";
 
 // Profanity word list (common offensive terms)
 const PROFANITY_LIST = [
-  "fuck", "shit", "ass", "bitch", "damn", "crap", "piss", "dick", "cock",
-  "pussy", "asshole", "bastard", "slut", "whore", "cunt", "fag", "nigger",
-  "nigga", "retard", "douche", "twat", "wanker", "bollocks", "bugger",
+  "fuck",
+  "shit",
+  "ass",
+  "bitch",
+  "damn",
+  "crap",
+  "piss",
+  "dick",
+  "cock",
+  "pussy",
+  "asshole",
+  "bastard",
+  "slut",
+  "whore",
+  "cunt",
+  "fag",
+  "nigger",
+  "nigga",
+  "retard",
+  "douche",
+  "twat",
+  "wanker",
+  "bollocks",
+  "bugger",
 ];
 
 // Check if text contains profanity
@@ -54,11 +76,30 @@ function isSpammy(text: string): { isSpam: boolean; reason?: string } {
 
   // Check for common spam phrases
   const spamPhrases = [
-    "buy now", "click here", "free money", "act now", "limited time",
-    "make money", "earn cash", "work from home", "casino", "viagra",
-    "cialis", "lottery", "winner", "congratulations you", "claim your",
-    "crypto", "bitcoin investment", "nft drop", "discord.gg", "t.me/",
-    "join now", "dm me", "check bio", "link in bio",
+    "buy now",
+    "click here",
+    "free money",
+    "act now",
+    "limited time",
+    "make money",
+    "earn cash",
+    "work from home",
+    "casino",
+    "viagra",
+    "cialis",
+    "lottery",
+    "winner",
+    "congratulations you",
+    "claim your",
+    "crypto",
+    "bitcoin investment",
+    "nft drop",
+    "discord.gg",
+    "t.me/",
+    "join now",
+    "dm me",
+    "check bio",
+    "link in bio",
   ];
   const lowerText = text.toLowerCase();
   for (const phrase of spamPhrases) {
@@ -68,7 +109,9 @@ function isSpammy(text: string): { isSpam: boolean; reason?: string } {
   }
 
   // Check for excessive special characters
-  const specialCharCount = (text.match(/[!@#$%^&*()_+=\[\]{}|\\:";'<>?,./~`]/g) || []).length;
+  const specialCharCount = (
+    text.match(/[!@#$%^&*()_+=\[\]{}|\\:";'<>?,./~`]/g) || []
+  ).length;
   if (specialCharCount > text.length * 0.3 && text.length > 10) {
     return { isSpam: true, reason: "Excessive special characters" };
   }
@@ -87,13 +130,19 @@ function isSpammy(text: string): { isSpam: boolean; reason?: string } {
 }
 
 // Validate all text fields
-function validateContent(fields: { name: string; value: string }[]): { valid: boolean; error?: string } {
+function validateContent(fields: { name: string; value: string }[]): {
+  valid: boolean;
+  error?: string;
+} {
   for (const field of fields) {
     if (!field.value.trim()) continue;
 
     // Check profanity
     if (containsProfanity(field.value)) {
-      return { valid: false, error: `${field.name} contains inappropriate language` };
+      return {
+        valid: false,
+        error: `${field.name} contains inappropriate language`,
+      };
     }
 
     // Check spam
@@ -155,6 +204,7 @@ interface AdminPageProps {
 }
 
 export default function AdminPage({ onBack }: AdminPageProps) {
+  const posthog = usePostHog();
   const venues = useQuery(api.events.getVenues);
   const createVenue = useMutation(api.events.createVenue);
   const addEvent = useMutation(api.events.addEvent);
@@ -262,7 +312,9 @@ export default function AdminPage({ onBack }: AdminPageProps) {
         isHeadliner: isHeadliner || undefined,
       });
 
-      setSuccessMessage(`Event added: ${artist} at ${isCreatingVenue ? newVenueName : venues?.find(v => v._id === selectedVenueId)?.name}`);
+      setSuccessMessage(
+        `Event added: ${artist} at ${isCreatingVenue ? newVenueName : venues?.find((v) => v._id === selectedVenueId)?.name}`,
+      );
 
       // Reset form (keep venue selection)
       setArtist("");
@@ -283,6 +335,7 @@ export default function AdminPage({ onBack }: AdminPageProps) {
       setErrorMessage(`Error adding event: ${error}`);
     } finally {
       setIsSubmitting(false);
+      posthog.capture("event_added");
     }
   };
 
@@ -294,8 +347,18 @@ export default function AdminPage({ onBack }: AdminPageProps) {
             onClick={onBack}
             className="p-2 hover:bg-white/20 rounded-lg transition-colors"
           >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            <svg
+              className="w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M15 19l-7-7 7-7"
+              />
             </svg>
           </button>
           <h1 className="text-lg sm:text-xl font-bold">Add Event</h1>
@@ -306,7 +369,9 @@ export default function AdminPage({ onBack }: AdminPageProps) {
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Venue Selection */}
           <div className="bg-white dark:bg-slate-800 rounded-lg p-4 shadow-sm">
-            <h2 className="font-semibold mb-3 text-slate-900 dark:text-white">Venue</h2>
+            <h2 className="font-semibold mb-3 text-slate-900 dark:text-white">
+              Venue
+            </h2>
 
             <div className="space-y-3">
               <label className="flex items-center gap-2">
@@ -316,7 +381,9 @@ export default function AdminPage({ onBack }: AdminPageProps) {
                   onChange={() => setIsCreatingVenue(false)}
                   className="text-purple-600"
                 />
-                <span className="text-sm text-slate-700 dark:text-slate-300">Select existing venue</span>
+                <span className="text-sm text-slate-700 dark:text-slate-300">
+                  Select existing venue
+                </span>
               </label>
 
               {!isCreatingVenue && (
@@ -341,7 +408,9 @@ export default function AdminPage({ onBack }: AdminPageProps) {
                   onChange={() => setIsCreatingVenue(true)}
                   className="text-purple-600"
                 />
-                <span className="text-sm text-slate-700 dark:text-slate-300">Create new venue</span>
+                <span className="text-sm text-slate-700 dark:text-slate-300">
+                  Create new venue
+                </span>
               </label>
 
               {isCreatingVenue && (
@@ -360,7 +429,9 @@ export default function AdminPage({ onBack }: AdminPageProps) {
                       onChange={(e) => setIsJazzFestVenue(e.target.checked)}
                       className="text-amber-500"
                     />
-                    <span className="text-sm text-slate-700 dark:text-slate-300">Jazz Fest venue (Fair Grounds)</span>
+                    <span className="text-sm text-slate-700 dark:text-slate-300">
+                      Jazz Fest venue (Fair Grounds)
+                    </span>
                   </label>
                 </div>
               )}
@@ -369,7 +440,9 @@ export default function AdminPage({ onBack }: AdminPageProps) {
 
           {/* Event Details */}
           <div className="bg-white dark:bg-slate-800 rounded-lg p-4 shadow-sm space-y-4">
-            <h2 className="font-semibold text-slate-900 dark:text-white">Event Details</h2>
+            <h2 className="font-semibold text-slate-900 dark:text-white">
+              Event Details
+            </h2>
 
             <div>
               <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
@@ -412,7 +485,9 @@ export default function AdminPage({ onBack }: AdminPageProps) {
                 placeholder="e.g., A Grateful Dead Celebration"
                 className="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white text-sm"
               />
-              <p className="text-xs text-slate-500 mt-1">Use for special events with a title separate from the artist</p>
+              <p className="text-xs text-slate-500 mt-1">
+                Use for special events with a title separate from the artist
+              </p>
             </div>
 
             <div>
@@ -426,7 +501,9 @@ export default function AdminPage({ onBack }: AdminPageProps) {
                 placeholder="e.g., John Doe, Jane Smith"
                 className="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-white text-sm"
               />
-              <p className="text-xs text-slate-500 mt-1">Comma-separated list of featured artists</p>
+              <p className="text-xs text-slate-500 mt-1">
+                Comma-separated list of featured artists
+              </p>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
@@ -476,13 +553,17 @@ export default function AdminPage({ onBack }: AdminPageProps) {
                 onChange={(e) => setIsHeadliner(e.target.checked)}
                 className="text-amber-500"
               />
-              <span className="text-sm text-slate-700 dark:text-slate-300">Headliner (for Jazz Fest filtering)</span>
+              <span className="text-sm text-slate-700 dark:text-slate-300">
+                Headliner (for Jazz Fest filtering)
+              </span>
             </label>
           </div>
 
           {/* CAPTCHA */}
           <div className="bg-white dark:bg-slate-800 rounded-lg p-4 shadow-sm">
-            <h2 className="font-semibold mb-3 text-slate-900 dark:text-white">Verification</h2>
+            <h2 className="font-semibold mb-3 text-slate-900 dark:text-white">
+              Verification
+            </h2>
             <div className="flex items-center gap-3">
               <div className="bg-slate-100 dark:bg-slate-700 px-4 py-2 rounded-lg font-mono text-lg text-slate-900 dark:text-white">
                 {captcha.question} = ?
@@ -501,8 +582,18 @@ export default function AdminPage({ onBack }: AdminPageProps) {
                 className="p-2 text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200"
                 title="New question"
               >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                <svg
+                  className="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                  />
                 </svg>
               </button>
             </div>
