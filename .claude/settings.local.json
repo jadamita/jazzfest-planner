@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:www.jazzfestgrids.com)",
+      "Bash(curl:*)",
+      "Bash(npm install:*)",
+      "Bash(npm run scrape:*)",
+      "Bash(npm run seed-headliners:*)",
+      "Bash(npx convex dev:*)"
+    ]
+  }
+}
