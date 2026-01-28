@@ -23,6 +23,33 @@ export const getPendingEventsCount = query({
   },
 });
 
+export const getLastUpdated = query({
+  args: {},
+  handler: async (ctx) => {
+    const metadata = await ctx.db
+      .query("metadata")
+      .withIndex("by_key", (q) => q.eq("key", "lastScraperRun"))
+      .first();
+    return metadata?.value || null;
+  },
+});
+
+export const setLastUpdated = internalMutation({
+  args: { timestamp: v.string() },
+  handler: async (ctx, { timestamp }) => {
+    const existing = await ctx.db
+      .query("metadata")
+      .withIndex("by_key", (q) => q.eq("key", "lastScraperRun"))
+      .first();
+
+    if (existing) {
+      await ctx.db.patch(existing._id, { value: timestamp });
+    } else {
+      await ctx.db.insert("metadata", { key: "lastScraperRun", value: timestamp });
+    }
+  },
+});
+
 export interface EventData {
   title?: string;
   artist: string;

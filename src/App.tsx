@@ -4,9 +4,27 @@ import { api } from "../convex/_generated/api";
 import CalendarGrid from "./components/CalendarGrid";
 import AdminPage from "./components/AdminPage";
 
+function formatLastUpdated(isoString: string | null): string | null {
+  if (!isoString) return null;
+  const date = new Date(isoString);
+  const now = new Date();
+  const diffMs = now.getTime() - date.getTime();
+  const diffMins = Math.floor(diffMs / 60000);
+  const diffHours = Math.floor(diffMs / 3600000);
+  const diffDays = Math.floor(diffMs / 86400000);
+
+  if (diffMins < 1) return "just now";
+  if (diffMins < 60) return `${diffMins}m ago`;
+  if (diffHours < 24) return `${diffHours}h ago`;
+  if (diffDays < 7) return `${diffDays}d ago`;
+
+  return date.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+}
+
 export default function App() {
   const calendarData = useQuery(api.events.getCalendarData);
   const pendingCount = useQuery(api.events.getPendingEventsCount);
+  const lastUpdated = useQuery(api.events.getLastUpdated);
   const [showAllJazzFest, setShowAllJazzFest] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [fuzzySearch, setFuzzySearch] = useState(true);
@@ -131,6 +149,11 @@ export default function App() {
                   <div className="w-4 h-4 bg-slate-200 dark:bg-slate-600 rounded" />
                   <span>Daze Between</span>
                 </div>
+                {lastUpdated && (
+                  <div className="text-slate-400 dark:text-slate-500 text-xs">
+                    Updated {formatLastUpdated(lastUpdated)}
+                  </div>
+                )}
               </div>
 
               {/* Toggle for showing all Jazz Fest artists */}

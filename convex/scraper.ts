@@ -335,6 +335,11 @@ export const scrapeAndImport = internalAction({
       shows: allShows,
     });
 
+    // Record the timestamp of this scraper run
+    await ctx.runMutation(internal.events.setLastUpdated, {
+      timestamp: new Date().toISOString(),
+    });
+
     console.log(
       `Imported ${result.eventsCreated} events from ${result.venuesCreated} venues`
     );
