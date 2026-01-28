@@ -361,6 +361,7 @@ async function main() {
       date: artist.date,
       artist: artist.artist,
       isHeadliner: artist.isHeadliner,
+      approved: true,
     });
   }
 

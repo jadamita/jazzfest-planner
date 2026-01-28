@@ -15,6 +15,14 @@ export const getEvents = query({
   },
 });
 
+export const getPendingEventsCount = query({
+  args: {},
+  handler: async (ctx) => {
+    const events = await ctx.db.query("events").collect();
+    return events.filter((e) => e.approved === false).length;
+  },
+});
+
 export interface EventData {
   title?: string;
   artist: string;
@@ -98,12 +106,13 @@ export const addEvent = mutation({
     doors: v.optional(v.string()),
     price: v.optional(v.string()),
     isHeadliner: v.optional(v.boolean()),
+    approved: v.optional(v.boolean()),
   },
   handler: async (ctx, args) => {
-    // User-submitted events require approval before being shown publicly
+    // Default to unapproved for user submissions, but allow approved to be set for seeding
     return await ctx.db.insert("events", {
       ...args,
-      approved: false,
+      approved: args.approved ?? false,
     });
   },
 });
