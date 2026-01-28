@@ -120,17 +120,45 @@ export const addEvent = mutation({
 export const clearData = mutation({
   args: {},
   handler: async (ctx) => {
-    const events = await ctx.db.query("events").collect();
-    for (const event of events) {
-      await ctx.db.delete(event._id);
-    }
-
     const venues = await ctx.db.query("venues").collect();
-    for (const venue of venues) {
-      await ctx.db.delete(venue._id);
+    const events = await ctx.db.query("events").collect();
+
+    // Identify venues and events to preserve
+    const jazzFestVenueIds = new Set(
+      venues.filter((v) => v.isJazzFest).map((v) => v._id),
+    );
+    const pendingEvents = events.filter((e) => e.approved === false);
+    const venuesWithPendingEvents = new Set(pendingEvents.map((e) => e.venueId));
+
+    let deletedEvents = 0;
+    for (const event of events) {
+      // Skip unapproved events (user submissions waiting for approval)
+      if (event.approved === false) continue;
+      // Skip JazzFest headliner events
+      if (jazzFestVenueIds.has(event.venueId)) continue;
+      await ctx.db.delete(event._id);
+      deletedEvents++;
     }
 
-    return { message: "Data cleared" };
+    let deletedVenues = 0;
+    for (const venue of venues) {
+      // Skip JazzFest venues (headliners)
+      if (venue.isJazzFest) continue;
+      // Skip venues that have pending events
+      if (venuesWithPendingEvents.has(venue._id)) continue;
+      await ctx.db.delete(venue._id);
+      deletedVenues++;
+    }
+
+    const jazzFestEvents = events.filter((e) => jazzFestVenueIds.has(e.venueId));
+
+    return {
+      message: "Data cleared",
+      deletedEvents,
+      deletedVenues,
+      preservedPendingEvents: pendingEvents.length,
+      preservedJazzFestEvents: jazzFestEvents.length,
+    };
   },
 });
 
