@@ -8,6 +8,7 @@ interface EventData {
   doors?: string;
   price?: string;
   isHeadliner?: boolean;
+  createdAt?: number;
 }
 
 interface CalendarGridProps {
@@ -301,10 +302,18 @@ interface EventCardProps {
   isJazzFestVenue: boolean;
 }
 
+const NEW_EVENT_THRESHOLD_MS = 48 * 60 * 60 * 1000; // 48 hours
+
+function isNewEvent(createdAt?: number): boolean {
+  if (!createdAt) return false;
+  return Date.now() - createdAt < NEW_EVENT_THRESHOLD_MS;
+}
+
 function EventCard({ event, isJazzFestVenue }: EventCardProps) {
   const hasDetails =
     event.featuring?.length || event.time || event.doors || event.price;
   const isHeadliner = event.isHeadliner;
+  const isNew = isNewEvent(event.createdAt);
 
   return (
     <div
@@ -320,6 +329,7 @@ function EventCard({ event, isJazzFestVenue }: EventCardProps) {
       <div
         className={`leading-tight ${isHeadliner ? "font-bold" : "font-medium"}`}
       >
+        {isNew && <span className="text-yellow-500 mr-1" title="Recently added">&#9733;</span>}
         <strong>{event.title || event.artist}</strong>
       </div>
 

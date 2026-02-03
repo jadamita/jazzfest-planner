@@ -58,6 +58,7 @@ export interface EventData {
   doors?: string;
   price?: string;
   isHeadliner?: boolean;
+  createdAt?: number;
 }
 
 export const getCalendarData = query({
@@ -88,6 +89,7 @@ export const getCalendarData = query({
         doors: event.doors,
         price: event.price,
         isHeadliner: event.isHeadliner,
+        createdAt: event._creationTime,
       });
     }
 

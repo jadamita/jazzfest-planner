@@ -149,6 +149,10 @@ export default function App() {
                   <div className="w-4 h-4 bg-slate-200 dark:bg-slate-600 rounded" />
                   <span>Daze Between</span>
                 </div>
+                <div className="flex items-center gap-1.5 sm:gap-2">
+                  <span className="text-yellow-500 text-sm sm:text-base">&#9733;</span>
+                  <span>New</span>
+                </div>
                 {lastUpdated && (
                   <div className="text-slate-400 dark:text-slate-500 text-xs">
                     Updated {formatLastUpdated(lastUpdated)}
