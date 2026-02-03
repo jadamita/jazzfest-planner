@@ -327,9 +327,9 @@ function EventCard({ event, isJazzFestVenue }: EventCardProps) {
     >
       {/* Title or Artist name - larger */}
       <div
-        className={`leading-tight ${isHeadliner ? "font-bold" : "font-medium"}`}
+        className={`leading-tight wrap-break-word ${isHeadliner ? "font-bold" : "font-medium"}`}
       >
-        {isNew && <span className="text-yellow-500 mr-1" title="Recently added">&#9733;</span>}
+        {isNew && <span className="text-yellow-500 mr-0.5 text-xs" title="Recently added">&#9733;</span>}
         <strong>{event.title || event.artist}</strong>
       </div>
 

@@ -32,6 +32,8 @@ export default defineSchema({
     isHeadliner: v.optional(v.boolean()),
     // Has this event been approved? (false for user submissions until reviewed)
     approved: v.optional(v.boolean()),
+    // When this event was first seen (persists across scraper re-imports)
+    firstSeenAt: v.optional(v.number()),
   })
     .index("by_venue", ["venueId"])
     .index("by_date", ["date"])

@@ -89,7 +89,7 @@ export const getCalendarData = query({
         doors: event.doors,
         price: event.price,
         isHeadliner: event.isHeadliner,
-        createdAt: event._creationTime,
+        createdAt: event.firstSeenAt ?? event._creationTime,
       });
     }
 
@@ -142,6 +142,7 @@ export const addEvent = mutation({
     return await ctx.db.insert("events", {
       ...args,
       approved: args.approved ?? false,
+      firstSeenAt: Date.now(),
     });
   },
 });
@@ -208,14 +209,34 @@ export const importScrapedData = internalMutation({
     ),
   },
   handler: async (ctx, { shows }) => {
+    const now = Date.now();
+
     // Get all venues
     const existingVenues = await ctx.db.query("venues").collect();
     const jazzFestVenueIds = new Set(
       existingVenues.filter((v) => v.isJazzFest).map((v) => v._id)
     );
 
-    // Delete non-JazzFest events
+    // Build venue ID -> name map before deletion
+    const venueIdToName: Record<string, string> = {};
+    for (const venue of existingVenues) {
+      venueIdToName[venue._id] = venue.name;
+    }
+
+    // Build a lookup of existing firstSeenAt by venue_name+date+artist
     const events = await ctx.db.query("events").collect();
+    const firstSeenMap: Record<string, number> = {};
+    for (const event of events) {
+      if (!jazzFestVenueIds.has(event.venueId)) {
+        const venueName = venueIdToName[event.venueId];
+        if (venueName) {
+          const key = `${venueName}|${event.date}|${event.artist}`;
+          firstSeenMap[key] = event.firstSeenAt ?? event._creationTime;
+        }
+      }
+    }
+
+    // Delete non-JazzFest events
     for (const event of events) {
       if (!jazzFestVenueIds.has(event.venueId)) {
         await ctx.db.delete(event._id);
@@ -255,6 +276,9 @@ export const importScrapedData = internalMutation({
       const venueId = venueIds[show.venue];
       if (!venueId) continue;
 
+      const key = `${show.venue}|${show.date}|${show.artist}`;
+      const firstSeenAt = firstSeenMap[key] ?? now;
+
       await ctx.db.insert("events", {
         venueId: venueId as any,
         date: show.date,
@@ -264,7 +288,8 @@ export const importScrapedData = internalMutation({
         time: show.time,
         doors: show.doors,
         price: show.price,
-        approved: true, // Scraped events are auto-approved
+        approved: true,
+        firstSeenAt,
       });
     }
 
