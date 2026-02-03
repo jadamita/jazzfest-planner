@@ -34,6 +34,22 @@ export const getLastUpdated = query({
   },
 });
 
+// One-time migration: mark all existing events as not new
+export const backfillFirstSeenAt = mutation({
+  args: {},
+  handler: async (ctx) => {
+    const events = await ctx.db.query("events").collect();
+    let updated = 0;
+    for (const event of events) {
+      if (event.firstSeenAt === undefined) {
+        await ctx.db.patch(event._id, { firstSeenAt: 0 });
+        updated++;
+      }
+    }
+    return { updated };
+  },
+});
+
 export const setLastUpdated = internalMutation({
   args: { timestamp: v.string() },
   handler: async (ctx, { timestamp }) => {
