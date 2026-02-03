@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useQuery } from "convex/react";
 import { api } from "../convex/_generated/api";
 import CalendarGrid from "./components/CalendarGrid";
@@ -31,6 +31,23 @@ export default function App() {
   const [showAdmin, setShowAdmin] = useState(false);
 
   const hasData = calendarData?.venues && calendarData.venues.length > 0;
+
+  const newShowCount = useMemo(() => {
+    if (!calendarData?.eventMap) return 0;
+    const threshold = 48 * 60 * 60 * 1000;
+    const now = Date.now();
+    let count = 0;
+    for (const venueEvents of Object.values(calendarData.eventMap)) {
+      for (const dayEvents of Object.values(venueEvents)) {
+        for (const event of dayEvents) {
+          if (event.createdAt && now - event.createdAt < threshold) {
+            count++;
+          }
+        }
+      }
+    }
+    return count;
+  }, [calendarData?.eventMap]);
 
   if (showAdmin) {
     return <AdminPage onBack={() => setShowAdmin(false)} />;
@@ -149,10 +166,12 @@ export default function App() {
                   <div className="w-4 h-4 bg-slate-200 dark:bg-slate-600 rounded" />
                   <span>Daze Between</span>
                 </div>
-                <div className="flex items-center gap-1.5 sm:gap-2">
-                  <span className="text-yellow-500 text-sm sm:text-base">&#9733;</span>
-                  <span>New</span>
-                </div>
+                {newShowCount > 0 && (
+                  <div className="flex items-center gap-1.5 sm:gap-2">
+                    <span className="text-yellow-500 text-sm sm:text-base">&#9733;</span>
+                    <span>{newShowCount} New</span>
+                  </div>
+                )}
                 {lastUpdated && (
                   <div className="text-slate-400 dark:text-slate-500 text-xs">
                     Updated {formatLastUpdated(lastUpdated)}
