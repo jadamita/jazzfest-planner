@@ -41,10 +41,8 @@ export const backfillFirstSeenAt = mutation({
     const events = await ctx.db.query("events").collect();
     let updated = 0;
     for (const event of events) {
-      if (event.firstSeenAt === undefined) {
-        await ctx.db.patch(event._id, { firstSeenAt: 0 });
-        updated++;
-      }
+      await ctx.db.patch(event._id, { firstSeenAt: 0 });
+      updated++;
     }
     return { updated };
   },
@@ -61,7 +59,10 @@ export const setLastUpdated = internalMutation({
     if (existing) {
       await ctx.db.patch(existing._id, { value: timestamp });
     } else {
-      await ctx.db.insert("metadata", { key: "lastScraperRun", value: timestamp });
+      await ctx.db.insert("metadata", {
+        key: "lastScraperRun",
+        value: timestamp,
+      });
     }
   },
 });
@@ -174,7 +175,9 @@ export const clearData = mutation({
       venues.filter((v) => v.isJazzFest).map((v) => v._id),
     );
     const pendingEvents = events.filter((e) => e.approved === false);
-    const venuesWithPendingEvents = new Set(pendingEvents.map((e) => e.venueId));
+    const venuesWithPendingEvents = new Set(
+      pendingEvents.map((e) => e.venueId),
+    );
 
     let deletedEvents = 0;
     for (const event of events) {
@@ -196,7 +199,9 @@ export const clearData = mutation({
       deletedVenues++;
     }
 
-    const jazzFestEvents = events.filter((e) => jazzFestVenueIds.has(e.venueId));
+    const jazzFestEvents = events.filter((e) =>
+      jazzFestVenueIds.has(e.venueId),
+    );
 
     return {
       message: "Data cleared",
@@ -221,7 +226,7 @@ export const importScrapedData = internalMutation({
         time: v.optional(v.string()),
         doors: v.optional(v.string()),
         price: v.optional(v.string()),
-      })
+      }),
     ),
   },
   handler: async (ctx, { shows }) => {
@@ -230,7 +235,7 @@ export const importScrapedData = internalMutation({
     // Get all venues
     const existingVenues = await ctx.db.query("venues").collect();
     const jazzFestVenueIds = new Set(
-      existingVenues.filter((v) => v.isJazzFest).map((v) => v._id)
+      existingVenues.filter((v) => v.isJazzFest).map((v) => v._id),
     );
 
     // Build venue ID -> name map before deletion
@@ -272,7 +277,7 @@ export const importScrapedData = internalMutation({
     // Find the highest order among existing venues
     const maxOrder = existingVenues.reduce(
       (max, v) => Math.max(max, v.order),
-      -1
+      -1,
     );
 
     // Create new venues
