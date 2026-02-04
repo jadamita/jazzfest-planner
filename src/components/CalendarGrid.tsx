@@ -318,11 +318,13 @@ function EventCard({ event, isJazzFestVenue }: EventCardProps) {
   return (
     <div
       className={`text-xs sm:text-sm p-1.5 sm:p-2 rounded mb-1.5 sm:mb-2 ${
-        isJazzFestVenue
-          ? isHeadliner
-            ? "bg-amber-300 dark:bg-amber-600 text-amber-900 dark:text-amber-100 ring-1 ring-amber-400"
-            : "bg-amber-100 dark:bg-amber-800/50 text-amber-800 dark:text-amber-200"
-          : "bg-blue-100 dark:bg-blue-900/50 text-blue-900 dark:text-blue-100"
+        isNew && !isJazzFestVenue
+          ? "bg-yellow-100 dark:bg-yellow-900/40 text-yellow-900 dark:text-yellow-100 ring-1 ring-yellow-300 dark:ring-yellow-700"
+          : isJazzFestVenue
+            ? isHeadliner
+              ? "bg-amber-300 dark:bg-amber-600 text-amber-900 dark:text-amber-100 ring-1 ring-amber-400"
+              : "bg-amber-100 dark:bg-amber-800/50 text-amber-800 dark:text-amber-200"
+            : "bg-blue-100 dark:bg-blue-900/50 text-blue-900 dark:text-blue-100"
       }`}
     >
       {/* Title or Artist name - larger */}

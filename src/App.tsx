@@ -168,7 +168,9 @@ export default function App() {
                 </div>
                 {newShowCount > 0 && (
                   <div className="flex items-center gap-1.5 sm:gap-2">
-                    <span className="text-yellow-500 text-sm sm:text-base">&#9733;</span>
+                    <div className="w-3 h-3 sm:w-4 sm:h-4 bg-yellow-100 dark:bg-yellow-900/40 rounded ring-1 ring-yellow-300 dark:ring-yellow-700 flex items-center justify-center">
+                      <span className="text-yellow-500 text-[8px] sm:text-[10px] leading-none">&#9733;</span>
+                    </div>
                     <span>{newShowCount} New</span>
                   </div>
                 )}
